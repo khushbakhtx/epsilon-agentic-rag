@@ -1,0 +1,6 @@
+langchain_experimental
+langchain_community
+langchain
+streamlit
+pandas
+tabulate
