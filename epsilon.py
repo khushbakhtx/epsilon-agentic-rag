@@ -29,13 +29,11 @@ def main():
             st.warning(f"File {csv_file} not found. Skipping.")
             continue
 
-        # Create agent for the file
         agent = create_csv_agent(
             OpenAI(temperature=0), csv_file, verbose=True, allow_dangerous_code=True
         )
         agents.append((csv_file, agent))
 
-        # Summarize file (e.g., columns, row count)
         try:
             df = pd.read_csv(csv_file)
             summary = {
