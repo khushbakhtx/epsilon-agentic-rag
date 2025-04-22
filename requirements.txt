@@ -1,5 +1,6 @@
-langchain_experimental
-langchain_community
+langchain-experimental
+langchain-community
+langchain-openai
 langchain
 streamlit
 pandas
