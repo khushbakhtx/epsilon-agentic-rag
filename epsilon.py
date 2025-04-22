@@ -1,5 +1,6 @@
 from langchain_experimental.agents import create_csv_agent
 from langchain_openai import OpenAI
+from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 import os
 import streamlit as st
@@ -22,6 +23,20 @@ def main():
         "data/oper_expenses.csv"
     ]
 
+    custom_prompt_template = PromptTemplate(
+        input_variables=["input", "file_name"],
+        template="""
+        You are a data analyst working with a CSV file named {file_name}. Your task is to answer questions about the data in a clear, concise, and accurate manner. Use Python and pandas to analyze the data. Follow these guidelines:
+        - Provide answers in a structured format, using bullet points where applicable.
+        - Answer in language that user asks a question. If it is RUSSIAN, answer in RUSSIAN. If it is ENGLISH, answer in ENGLISH.
+
+        File: {file_name}
+        User question: {input}
+
+        Answer the question based on the data in {file_name}.
+        """
+    )
+
     agents = []
     file_summaries = []
     for csv_file in csv_files:
@@ -30,7 +45,10 @@ def main():
             continue
 
         agent = create_csv_agent(
-            OpenAI(temperature=0), csv_file, verbose=True, allow_dangerous_code=True
+            OpenAI(temperature=0),
+            csv_file,
+            verbose=True,
+            allow_dangerous_code=True
         )
         agents.append((csv_file, agent))
 
@@ -59,7 +77,7 @@ def main():
             response = ""
             for file_name, agent in agents:
                 try:
-                    result = agent.run(f"For file {file_name}: {user_question}")
+                    result = agent.run(custom_prompt_template.format(input=user_question, file_name=file_name))
                     response += f"**{file_name}**: {result}\n"
                 except Exception as e:
                     response += f"**{file_name}**: Error processing question ({str(e)})\n"
